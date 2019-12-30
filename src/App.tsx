@@ -1,26 +1,77 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { Component } from 'react';
 import './App.css';
+import CardList from './Components/CardList/CardList';
+import Search from './Components/SearchBox/Search';
 
-const App: React.FC = () => {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+interface IProps {
+  superhero: string;
+}
+
+interface Monster {
+  name: string;
+}
+
+interface IState {
+  monsters: Monster[],
+  search: string,
+}
+
+class App extends Component<IProps, IState> {
+
+  state: IState;
+  
+  constructor(props: IProps){
+    
+    super(props);
+
+    this.state = {
+      monsters: [],
+      search: '',
+    }
+
+  }
+
+  componentDidMount(){
+    fetch('https://jsonplaceholder.typicode.com/users')
+    .then(response => response.json())
+    .then(users => this.setState({monsters: users}))
+  }
+
+  render(){
+
+    interface IContact {
+      id: number;
+      name: string;
+    }
+
+    const searchMonsters = (e: any) => {
+     
+      this.setState(
+        { 
+          search: e.target.value
+        }
+      );
+
+    }
+
+    const { monsters, search } = this.state;
+
+    const filteredMonsters = monsters.filter( monster => {
+      return monster.name.toLowerCase().includes(search)
+    });
+
+    return (
+      <div className="App">
+        <Search
+        placeholder = "Search Monster" 
+        handleChange = {searchMonsters}
+        />
+        <CardList monsters={filteredMonsters}/>
+      </div>
+    );
+
+  }
+
 }
 
 export default App;
